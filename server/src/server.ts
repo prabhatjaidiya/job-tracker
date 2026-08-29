@@ -1,4 +1,5 @@
 import "dotenv/config";
+console.log("JWT_SECRET loaded:", Boolean(process.env.JWT_SECRET));
 import app from "./app.js";
 import connectDB from "./config/database.js";
 
