@@ -1,7 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
+    const navigate = useNavigate();
+    const { setUser } = useAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -33,11 +37,8 @@ function Login() {
             }
 
             localStorage.setItem("token", data.token);
-
-            console.log("Login successful:", data);
-
-            // Authentication state will be handled by AuthContext later.
-            // For now, we are only verifying the API connection.
+            setUser(data.user);
+            navigate("/dashboard");
         } catch (error) {
             console.error(error);
             setError("Unable to connect to the server");
