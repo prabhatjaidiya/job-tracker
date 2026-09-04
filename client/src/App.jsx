@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import AddApplication from "./pages/AddApplication";
 
 function App() {
     return (
@@ -22,6 +23,15 @@ function App() {
                     element={
                         <DashboardLayout>
                             <Dashboard />
+                        </DashboardLayout>
+                    }
+                />
+
+                <Route
+                    path="/applications/add"
+                    element={
+                        <DashboardLayout>
+                            <AddApplication />
                         </DashboardLayout>
                     }
                 />
