@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import AddApplication from "./pages/AddApplication";
 import Applications from "./pages/Applications";
+import ApplicationDetails from "./pages/ApplicationDetails";
 
 function App() {
     return (
@@ -42,6 +43,15 @@ function App() {
                     element={
                         <DashboardLayout>
                             <AddApplication />
+                        </DashboardLayout>
+                    }
+                />
+
+                <Route
+                    path="/applications/:id"
+                    element={
+                        <DashboardLayout>
+                            <ApplicationDetails />
                         </DashboardLayout>
                     }
                 />
