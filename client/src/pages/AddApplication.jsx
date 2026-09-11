@@ -83,7 +83,7 @@ function AddApplication() {
             if (!response.ok) {
                 setApiError(
                     data.message ||
-                        "Failed to create application."
+                    "Failed to create application."
                 );
                 return;
             }
@@ -118,11 +118,10 @@ function AddApplication() {
     };
 
     const inputClass = (field) => {
-        return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 ${
-            errors[field]
-                ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
-                : "border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-        }`;
+        return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 ${errors[field]
+            ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+            : "border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+            }`;
     };
 
     return (

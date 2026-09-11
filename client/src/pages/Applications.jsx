@@ -13,45 +13,45 @@ function Applications() {
     // Day 12 - Step 8: Sorting
     const [sortOption, setSortOption] = useState("applied-newest");
 
-    useEffect(() => {
-        const fetchApplications = async () => {
-            setLoading(true);
-            setError("");
+    const fetchApplications = async () => {
+        setLoading(true);
+        setError("");
 
-            try {
-                const token = localStorage.getItem("token");
+        try {
+            const token = localStorage.getItem("token");
 
-                const response = await fetch(
-                    "http://localhost:5000/api/applications",
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    setError(
-                        data.message || "Failed to fetch applications."
-                    );
-                    return;
+            const response = await fetch(
+                "http://localhost:5000/api/applications",
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
+            );
 
-                setApplications(data.data);
-            } catch (error) {
-                setError("Unable to connect to the server.");
-                console.error(
-                    "Failed to fetch applications:",
-                    error
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(
+                    data.message || "Failed to fetch applications."
                 );
-            } finally {
-                setLoading(false);
+                return;
             }
-        };
 
+            setApplications(data.data);
+        } catch (error) {
+            setError("Unable to connect to the server.");
+            console.error(
+                "Failed to fetch applications:",
+                error
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchApplications();
     }, []);
 
@@ -308,22 +308,32 @@ function Applications() {
                 </div>
 
                 {/* Error */}
-                {error && (
+                {error && !loading && (
                     <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
-                        <div className="flex items-start gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
-                                !
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                                    !
+                                </div>
+
+                                <div>
+                                    <p className="text-sm font-semibold text-red-700">
+                                        Something went wrong
+                                    </p>
+
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {error}
+                                    </p>
+                                </div>
                             </div>
 
-                            <div>
-                                <p className="text-sm font-semibold text-red-700">
-                                    Something went wrong
-                                </p>
-
-                                <p className="mt-1 text-sm text-red-600">
-                                    {error}
-                                </p>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={fetchApplications}
+                                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-100"
+                            >
+                                Try Again
+                            </button>
                         </div>
                     </div>
                 )}
@@ -340,8 +350,8 @@ function Applications() {
                                     </h2>
 
                                     <p className="mt-1 text-sm text-slate-500">
-                                        {sortedApplications.length}{" "}
-                                        {sortedApplications.length === 1
+                                        {applications.length}{" "}
+                                        {applications.length === 1
                                             ? "application"
                                             : "applications"}{" "}
                                         tracked
@@ -599,6 +609,30 @@ function Applications() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    ) : error ? (
+                        <div className="p-8 sm:p-12">
+                            <div className="mx-auto max-w-md text-center">
+                                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-2xl">
+                                    !
+                                </div>
+
+                                <h3 className="mt-5 text-lg font-bold text-slate-900">
+                                    Unable to load applications
+                                </h3>
+
+                                <p className="mt-2 text-sm leading-6 text-slate-500">
+                                    We couldn't load your applications. Please try again.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    onClick={fetchApplications}
+                                    className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
+                                >
+                                    Try Again
+                                </button>
+                            </div>
                         </div>
                     ) : applications.length === 0 ? (
                         /* Empty State */

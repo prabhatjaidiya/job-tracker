@@ -29,9 +29,14 @@ function ApplicationDetails() {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    setError(
-                        data.message || "Failed to fetch application."
-                    );
+                    if (response.status === 404) {
+                        setError("Application not found.");
+                    } else {
+                        setError(
+                            data.message || "Failed to fetch application."
+                        );
+                    }
+
                     return;
                 }
 

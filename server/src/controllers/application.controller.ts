@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import JobApplication from "../models/JobApplication.js";
 
 export const createApplication = async (
@@ -53,6 +54,14 @@ export const getApplication = async (
     res: Response
 ): Promise<void> => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(404).json({
+                success: false,
+                message: "Application not found",
+            });
+            return;
+        }
+
         const application = await JobApplication.findOne({
             _id: req.params.id,
             user: req.user._id,
