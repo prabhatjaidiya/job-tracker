@@ -52,6 +52,9 @@ function Applications() {
     };
 
     useEffect(() => {
+        // This effect intentionally performs the initial API request.
+        // fetchApplications manages loading/error/application state.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchApplications();
     }, []);
 

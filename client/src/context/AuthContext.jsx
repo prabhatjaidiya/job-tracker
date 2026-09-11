@@ -1,11 +1,9 @@
 import {
-    createContext,
-    useContext,
     useEffect,
     useState,
 } from "react";
 
-const AuthContext = createContext(null);
+import { AuthContext } from "./AuthContextValue.js";
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -14,12 +12,12 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        if (!token) {
-            setLoading(false);
-            return;
-        }
-
         const restoreUser = async () => {
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
             try {
                 const response = await fetch(
                     "http://localhost:5000/api/auth/me",
@@ -42,7 +40,10 @@ export function AuthProvider({ children }) {
 
                 setUser(data.user);
             } catch (error) {
-                console.error("Failed to restore authentication:", error);
+                console.error(
+                    "Failed to restore authentication:",
+                    error
+                );
                 localStorage.removeItem("token");
                 setUser(null);
             } finally {
@@ -71,8 +72,4 @@ export function AuthProvider({ children }) {
             {children}
         </AuthContext.Provider>
     );
-}
-
-export function useAuth() {
-    return useContext(AuthContext);
 }
