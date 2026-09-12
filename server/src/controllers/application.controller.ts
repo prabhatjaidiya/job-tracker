@@ -159,3 +159,62 @@ export const deleteApplication = async (
         });
     }
 };
+
+export const getApplicationStats = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const stats = await JobApplication.aggregate([
+            { $match: { user: req.user._id } },
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+        type StatsKey =
+            | "applied"
+            | "interviews"
+            | "assessments"
+            | "offers"
+            | "rejected"
+            | "withdrawn";
+            
+        const statusMap: Record<string, StatsKey> = {
+            Applied: "applied",
+            Interview: "interviews",
+            Assessment: "assessments",
+            Offer: "offers",
+            Rejected: "rejected",
+            Withdrawn: "withdrawn",
+        };
+        const formattedStats = stats.reduce((acc, stat) => {
+            const status = statusMap[stat._id];
+            if (status) {
+                acc[status] = stat.count;
+            }
+            acc.totalApplications += stat.count;
+            return acc;
+        }, {
+            totalApplications: 0,
+            applied: 0,
+            interviews: 0,
+            assessments: 0,
+            offers: 0,
+            rejected: 0,
+            withdrawn: 0,
+        });
+        res.status(200).json({
+            success: true,
+            data: formattedStats,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch application stats",
+        });
+    }
+};

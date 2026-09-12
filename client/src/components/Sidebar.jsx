@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 function Sidebar({ isOpen, onClose }) {
     return (
         <aside
-            className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-slate-900 p-6 text-white transition-transform md:static md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+            className={`fixed inset-y-0 left-0 z-40 w-50 lg:w-64 transform bg-slate-900 p-6 text-white transition-transform md:static md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
         >
             <h2 className="mb-8 text-2xl font-bold">
