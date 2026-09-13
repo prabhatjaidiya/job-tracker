@@ -166,14 +166,49 @@ export const getApplicationStats = async (
 ): Promise<void> => {
     try {
         const stats = await JobApplication.aggregate([
-            { $match: { user: req.user._id } },
             {
-                $group: {
-                    _id: "$status",
-                    count: { $sum: 1 },
+                $match: {
+                    user: req.user._id,
+                },
+            },
+            {
+                $facet: {
+                    statusStats: [
+                        {
+                            $group: {
+                                _id: "$status",
+                                count: { $sum: 1 },
+                            },
+                        },
+                    ],
+
+                    applicationTrend: [
+                        {
+                            $match: {
+                                appliedDate: { $exists: true, $ne: null },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    $dateToString: {
+                                        format: "%Y-%m-%d",
+                                        date: "$appliedDate",
+                                    },
+                                },
+                                applications: { $sum: 1 },
+                            },
+                        },
+                        {
+                            $sort: {
+                                _id: 1,
+                            },
+                        },
+                    ],
                 },
             },
         ]);
+
         type StatsKey =
             | "applied"
             | "interviews"
@@ -181,7 +216,7 @@ export const getApplicationStats = async (
             | "offers"
             | "rejected"
             | "withdrawn";
-            
+
         const statusMap: Record<string, StatsKey> = {
             Applied: "applied",
             Interview: "interviews",
@@ -190,28 +225,58 @@ export const getApplicationStats = async (
             Rejected: "rejected",
             Withdrawn: "withdrawn",
         };
-        const formattedStats = stats.reduce((acc, stat) => {
-            const status = statusMap[stat._id];
-            if (status) {
-                acc[status] = stat.count;
+
+        const formattedStats = stats[0].statusStats.reduce(
+            (acc: {
+                totalApplications: number;
+                applied: number;
+                interviews: number;
+                assessments: number;
+                offers: number;
+                rejected: number;
+                withdrawn: number;
+            }, stat: { _id: string; count: number }) => {
+                const status = statusMap[stat._id];
+
+                if (status) {
+                    acc[status] = stat.count;
+                }
+
+                acc.totalApplications += stat.count;
+
+                return acc;
+            },
+            {
+                totalApplications: 0,
+                applied: 0,
+                interviews: 0,
+                assessments: 0,
+                offers: 0,
+                rejected: 0,
+                withdrawn: 0,
             }
-            acc.totalApplications += stat.count;
-            return acc;
-        }, {
-            totalApplications: 0,
-            applied: 0,
-            interviews: 0,
-            assessments: 0,
-            offers: 0,
-            rejected: 0,
-            withdrawn: 0,
-        });
+        );
+
+        const applicationTrend = stats[0].applicationTrend.map(
+            (item: {
+                _id: string;
+                applications: number;
+            }) => ({
+                date: item._id,
+                applications: item.applications,
+            })
+        );
+
         res.status(200).json({
             success: true,
-            data: formattedStats,
+            data: {
+                ...formattedStats,
+                applicationTrend,
+            },
         });
     } catch (error) {
         console.error(error);
+
         res.status(500).json({
             success: false,
             message: "Failed to fetch application stats",

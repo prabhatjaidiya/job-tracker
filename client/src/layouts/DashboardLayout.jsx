@@ -20,10 +20,10 @@ function DashboardLayout({ children }) {
                 onClose={closeSidebar}
             />
 
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 h-screen flex flex-col overflow-hidden">
                 <Header onMenuClick={openSidebar} />
 
-                <main className="p-4 md:p-6">
+                <main className="min-h-0 flex-1 overflow-y-auto">
                     {children}
                 </main>
             </div>
