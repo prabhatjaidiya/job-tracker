@@ -9,6 +9,7 @@ export const createApplication = async (
     try {
         const application = await JobApplication.create({
             ...req.body,
+            jobUrl: req.body.jobUrl?.trim() || undefined,
             user: req.user._id,
         });
 
@@ -16,8 +17,16 @@ export const createApplication = async (
             success: true,
             data: application,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
+
+        if (error.code === 11000) {
+            res.status(409).json({
+                success: false,
+                message: "You already have an application for this job posting.",
+            });
+            return;
+        }
 
         res.status(400).json({
             success: false,
@@ -118,8 +127,16 @@ export const updateApplication = async (
             success: true,
             data: application,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
+
+        if (error.code === 11000) {
+            res.status(409).json({
+                success: false,
+                message: "You already have an application for this job posting.",
+            });
+            return;
+        }
 
         res.status(400).json({
             success: false,

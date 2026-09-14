@@ -1,4 +1,3 @@
-import React from 'react'
 import {
     BarChart,
     Bar,
@@ -9,27 +8,21 @@ import {
     ResponsiveContainer,
     Cell,
     LabelList,
-    PieChart,
-    Pie,
 } from "recharts";
 
-const Charts = ({ statusChartData, totalApplications }) => {
+const Charts = ({ statusChartData }) => {
     return (
-        <div className="grid grid-cols-1 gap-6 p-4 sm:p-6 xl:grid-cols-[minmax(0,1fr)_260px]">
-            {/* Bar Chart */}
+        <div className="p-4 sm:p-6">
             <div className="min-w-0">
                 <div className="h-[360px] w-full">
-                    <ResponsiveContainer
-                        width="100%"
-                        height="100%"
-                    >
+                    <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             data={statusChartData}
                             margin={{
                                 top: 35,
                                 right: 10,
                                 left: -10,
-                                bottom: 10,
+                                bottom: 25,
                             }}
                             barCategoryGap="18%"
                         >
@@ -147,9 +140,10 @@ const Charts = ({ statusChartData, totalApplications }) => {
                                 dataKey="name"
                                 axisLine={false}
                                 tickLine={false}
+                                interval={0}
                                 tick={{
                                     fill: "#64748B",
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     fontWeight: 500,
                                 }}
                                 dy={10}
@@ -234,74 +228,11 @@ const Charts = ({ statusChartData, totalApplications }) => {
                             <span className="text-xs font-medium text-slate-600">
                                 {item.name}
                             </span>
-
-                            <span className="text-xs font-bold text-slate-900">
-                                {item.value}
-                            </span>
                         </div>
                     ))}
                 </div>
             </div>
-
-            {/* Donut Chart */}
-            <div className="rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-violet-50/80 p-4 sm:p-5">
-                <div className="flex h-full flex-col items-center justify-center">
-                    <div className="h-[230px] w-full">
-                        <ResponsiveContainer
-                            width="100%"
-                            height="100%"
-                        >
-                            <PieChart>
-                                <Pie
-                                    data={statusChartData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={62}
-                                    outerRadius={88}
-                                    paddingAngle={2}
-                                    stroke="#FFFFFF"
-                                    strokeWidth={3}
-                                >
-                                    {statusChartData.map((entry) => (
-                                        <Cell
-                                            key={entry.name}
-                                            fill={entry.color}
-                                        />
-                                    ))}
-                                </Pie>
-
-                                <Tooltip
-                                    contentStyle={{
-                                        borderRadius: "12px",
-                                        border: "1px solid #E2E8F0",
-                                        boxShadow:
-                                            "0 10px 25px rgba(15, 23, 42, 0.08)",
-                                    }}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Center total */}
-                    <div className="-mt-[145px] mb-[100px] text-center">
-                        <p className="text-3xl font-extrabold text-slate-900">
-                            {totalApplications}
-                        </p>
-
-                        <p className="text-xs font-medium text-slate-500">
-                            Total
-                        </p>
-                    </div>
-
-                    <p className="mt-1 text-center text-sm italic leading-6 text-slate-500">
-                        A little progress each day adds up to big
-                        results.
-                    </p>
-                </div>
-            </div>
-        </div>
+        </div >
     )
 }
 

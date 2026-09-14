@@ -8,6 +8,7 @@ import PublicRoute from "./components/PublicRoute";
 import AddApplication from "./pages/AddApplication";
 import Applications from "./pages/Applications";
 import ApplicationDetails from "./pages/ApplicationDetails";
+import EditApplication from "./pages/EditApplication";
 
 function App() {
     return (
@@ -54,6 +55,11 @@ function App() {
                             <ApplicationDetails />
                         </DashboardLayout>
                     }
+                />
+
+                <Route
+                    path="/applications/:id/edit"
+                    element={<EditApplication />}
                 />
             </Route>
 

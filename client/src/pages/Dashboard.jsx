@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import ApplicationTrend from "../components/ApplicationTrend";
 import Charts from "../components/Charts";
+import DashboardInsights from "../components/DashboardInsights";
 
 function Dashboard() {
     const [loading, setLoading] = useState(true);
@@ -205,18 +207,8 @@ function Dashboard() {
                 <div className="flex h-full w-full items-center justify-center rounded-3xl border border-rose-200 bg-white p-10 shadow-sm">
                     <div className="flex flex-col items-center text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
-                            <svg
-                                className="h-7 w-7"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 9v3.5m0 4h.01M10.3 3.8l-7.1 12.3A2 2 0 005 19h14a2 2 0 001.8-2.9L13.7 3.8a2 2 0 00-3.4 0z"
-                                />
+                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.5m0 4h.01M10.3 3.8l-7.1 12.3A2 2 0 005 19h14a2 2 0 001.8-2.9L13.7 3.8a2 2 0 00-3.4 0z" />
                             </svg>
                         </div>
 
@@ -238,7 +230,7 @@ function Dashboard() {
                         </button>
                     </div>
                 </div>
-            </section>
+            </section >
         );
     }
 
@@ -266,7 +258,7 @@ function Dashboard() {
                 </div>
 
                 {/* Date / motivation card */}
-                <div className="flex items-center gap-3 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-violet-50 px-4 py-3 shadow-sm">
+                <div className="xl:flex items-center hidden  gap-3 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-violet-50 px-4 py-3 shadow-sm">
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
                         <svg
                             className="h-5 w-5"
@@ -362,7 +354,11 @@ function Dashboard() {
             {/* Zero Applications */}
             {stats.totalApplications === 0 && (
                 <div className="mb-5 rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                    <Link
+                        to="/applications/add"
+                        className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition hover:-translate-y-0.5 hover:bg-blue-100"
+                        aria-label="Add application"
+                    >
                         <svg
                             className="h-7 w-7"
                             fill="none"
@@ -376,7 +372,7 @@ function Dashboard() {
                                 d="M12 6v12m6-6H6"
                             />
                         </svg>
-                    </div>
+                    </Link>
 
                     <h3 className="mt-5 text-xl font-bold text-slate-900">
                         No applications yet
@@ -428,54 +424,56 @@ function Dashboard() {
             </div>
 
             {/* Analytics */}
-            <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                {/* Analytics Header */}
-                <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-blue-100 text-violet-600">
-                            <svg
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-7"
-                                />
-                            </svg>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    {/* Analytics Header */}
+                    <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-blue-100 text-violet-600">
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-7"
+                                    />
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900">
+                                    Applications by Status
+                                </h3>
+
+                                <p className="mt-1 text-sm text-slate-500">
+                                    Distribution of your current job applications.
+                                </p>
+                            </div>
                         </div>
 
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900">
-                                Applications by Status
-                            </h3>
+                        <div className="flex items-center gap-2 self-start rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 lg:self-auto">
+                            <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
 
-                            <p className="mt-1 text-sm text-slate-500">
-                                Distribution of your current job applications.
-                            </p>
+                            <span className="text-sm font-semibold text-blue-700">
+                                {stats.totalApplications} Applications
+                            </span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-start rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 lg:self-auto">
-                        <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-
-                        <span className="text-sm font-semibold text-blue-700">
-                            {stats.totalApplications} Applications
-                        </span>
-                    </div>
+                    <Charts
+                        statusChartData={statusChartData}
+                    />
                 </div>
-
-                <Charts
-                    statusChartData={statusChartData}
-                    totalApplications={stats.totalApplications}
+                <ApplicationTrend
+                    applicationTrendData={applicationTrendData}
                 />
             </div>
-            <ApplicationTrend
-                applicationTrendData={applicationTrendData}
-            />
+            <DashboardInsights stats={stats} applicationTrendData={applicationTrendData} />
         </section>
     );
 }

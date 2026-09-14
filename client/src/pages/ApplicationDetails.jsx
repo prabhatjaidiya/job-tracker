@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function ApplicationDetails() {
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [application, setApplication] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         const fetchApplication = async () => {
@@ -128,6 +130,49 @@ function ApplicationDetails() {
         return company.charAt(0).toUpperCase();
     };
 
+    const handleDelete = async () => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this application?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        setDeleting(true);
+        setError("");
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/applications/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(
+                    data.message || "Failed to delete application."
+                );
+                return;
+            }
+
+            navigate("/applications");
+        } catch (error) {
+            console.error("Failed to delete application:", error);
+            setError("Unable to connect to the server.");
+        } finally {
+            setDeleting(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
@@ -240,7 +285,34 @@ function ApplicationDetails() {
                             </div>
 
                             {/* Status */}
-                            <div className="flex shrink-0">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Link
+                                    to={`/applications/${id}/edit`}
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-md transition hover:-translate-y-0.5 hover:bg-slate-50"
+                                >
+                                    <span>✎</span>
+                                    Edit
+                                </Link>
+
+                                <button
+                                    type="button"
+                                    onClick={handleDelete}
+                                    disabled={deleting}
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-red-600 shadow-md transition hover:-translate-y-0.5 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {deleting ? (
+                                        <>
+                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-red-200 border-t-red-600" />
+                                            Deleting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>🗑</span>
+                                            Delete
+                                        </>
+                                    )}
+                                </button>
+
                                 <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-md">
                                     <span
                                         className={`h-2.5 w-2.5 rounded-full ${statusStyles.dot}`}

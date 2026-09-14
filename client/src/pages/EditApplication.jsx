@@ -1,11 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
-function AddApplication() {
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState("");
-    const [apiError, setApiError] = useState("");
+function EditApplication() {
+    const { id } = useParams();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         company: "",
@@ -21,6 +19,70 @@ function AddApplication() {
         notes: "",
         contact: "",
     });
+
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [apiError, setApiError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    useEffect(() => {
+        const fetchApplication = async () => {
+            setLoading(true);
+            setApiError("");
+
+            try {
+                const token = localStorage.getItem("token");
+
+                const response = await fetch(
+                    `http://localhost:5000/api/applications/${id}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    setApiError(
+                        data.message || "Failed to fetch application."
+                    );
+                    return;
+                }
+
+                const application = data.data;
+
+                setFormData({
+                    company: application.company || "",
+                    position: application.position || "",
+                    location: application.location || "",
+                    jobType: application.jobType || "",
+                    salary: application.salary ?? "",
+                    status: application.status || "",
+                    appliedDate: application.appliedDate
+                        ? application.appliedDate.slice(0, 10)
+                        : "",
+                    deadline: application.deadline
+                        ? application.deadline.slice(0, 10)
+                        : "",
+                    jobUrl: application.jobUrl || "",
+                    description: application.description || "",
+                    notes: application.notes || "",
+                    contact: application.contact || "",
+                });
+            } catch (error) {
+                console.error("Failed to fetch application:", error);
+                setApiError("Unable to connect to the server.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchApplication();
+    }, [id]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -45,60 +107,13 @@ function AddApplication() {
             newErrors.status = "Status is required";
         }
 
+        if (!formData.jobUrl.trim()) {
+            newErrors.jobUrl = "Job URL is required";
+        }
+
         setErrors(newErrors);
 
         return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        setApiError("");
-        setSuccess("");
-
-        const isValid = validateForm();
-
-        if (!isValid) {
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const token = localStorage.getItem("token");
-
-            const response = await fetch(
-                "http://localhost:5000/api/applications",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(formData),
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setApiError(
-                    data.message ||
-                    "Failed to create application."
-                );
-                return;
-            }
-
-            setSuccess("Application added successfully.");
-            console.log(data);
-        } catch (error) {
-            setApiError("Unable to connect to the server.");
-            console.error(
-                "Failed to create application:",
-                error
-            );
-        } finally {
-            setLoading(false);
-        }
     };
 
     const handleChange = (event) => {
@@ -115,43 +130,134 @@ function AddApplication() {
                 [name]: "",
             }));
         }
+
+        setApiError("");
+        setSuccess("");
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        setApiError("");
+        setSuccess("");
+
+        if (!validateForm()) {
+            return;
+        }
+
+        setSaving(true);
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/applications/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        ...formData,
+                        jobUrl: formData.jobUrl.trim(),
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setApiError(
+                    data.message || "Failed to update application."
+                );
+                return;
+            }
+
+            setSuccess("Application updated successfully.");
+
+            setTimeout(() => {
+                navigate(`/applications/${id}`);
+            }, 800);
+        } catch (error) {
+            console.error("Failed to update application:", error);
+            setApiError("Unable to connect to the server.");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const inputClass = (field) => {
         return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 ${errors[field]
-            ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
-            : "border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                : "border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
             }`;
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
+                <div className="mx-auto max-w-5xl">
+                    <div className="h-5 w-36 animate-pulse rounded bg-slate-200" />
+
+                    <div className="mt-5 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                        <div className="h-40 animate-pulse bg-slate-200" />
+
+                        <div className="space-y-4 p-6 sm:p-8">
+                            <div className="h-5 w-1/3 animate-pulse rounded bg-slate-200" />
+                            <div className="h-12 animate-pulse rounded-xl bg-slate-100" />
+                            <div className="h-12 animate-pulse rounded-xl bg-slate-100" />
+                            <div className="h-12 animate-pulse rounded-xl bg-slate-100" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (apiError && !formData.company) {
+        return (
+            <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
+                <div className="mx-auto max-w-5xl">
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+                        <p className="font-medium text-red-700">
+                            {apiError}
+                        </p>
+
+                        <Link
+                            to="/applications"
+                            className="mt-4 inline-flex font-medium text-red-700 hover:underline"
+                        >
+                            ← Back to Applications
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
             <div className="mx-auto max-w-5xl">
-
-                {/* Back Navigation */}
                 <Link
-                    to="/applications"
+                    to={`/applications/${id}`}
                     className="group mb-5 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
                 >
                     <span className="transition-transform group-hover:-translate-x-1">
                         ←
                     </span>
 
-                    Applications
+                    Application Details
                 </Link>
 
-                {/* Main Card */}
                 <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
-
-                    {/* Header */}
                     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 px-6 py-8 sm:px-8 sm:py-10">
-                        {/* Decorative shapes */}
                         <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10" />
                         <div className="absolute -bottom-28 right-48 h-52 w-52 rounded-full bg-white/5" />
 
                         <div className="relative flex items-center gap-4">
                             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-2xl shadow-lg">
-                                +
+                                ✎
                             </div>
 
                             <div className="text-white">
@@ -160,23 +266,20 @@ function AddApplication() {
                                 </p>
 
                                 <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-                                    Add Application
+                                    Edit Application
                                 </h1>
 
                                 <p className="mt-1 text-sm text-white/75">
-                                    Track a new opportunity in your job
-                                    search.
+                                    Update your application information.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Form */}
                     <form
-                        className="p-6 sm:p-8"
                         onSubmit={handleSubmit}
+                        className="p-6 sm:p-8"
                     >
-                        {/* Success */}
                         {success && (
                             <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
                                 <div className="flex items-start gap-3">
@@ -186,7 +289,7 @@ function AddApplication() {
 
                                     <div>
                                         <p className="text-sm font-semibold text-emerald-800">
-                                            Application added
+                                            Application updated
                                         </p>
 
                                         <p className="mt-1 text-sm text-emerald-700">
@@ -197,7 +300,6 @@ function AddApplication() {
                             </div>
                         )}
 
-                        {/* API Error */}
                         {apiError && (
                             <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
                                 <div className="flex items-start gap-3">
@@ -207,7 +309,7 @@ function AddApplication() {
 
                                     <div>
                                         <p className="text-sm font-semibold text-red-800">
-                                            Unable to add application
+                                            Unable to update application
                                         </p>
 
                                         <p className="mt-1 text-sm text-red-700">
@@ -237,28 +339,22 @@ function AddApplication() {
                             </div>
 
                             <div className="grid gap-5 sm:grid-cols-2">
-                                {/* Company */}
                                 <div>
                                     <label
                                         htmlFor="company"
                                         className="text-sm font-semibold text-slate-700"
                                     >
                                         Company{" "}
-                                        <span className="text-red-500">
-                                            *
-                                        </span>
+                                        <span className="text-red-500">*</span>
                                     </label>
 
                                     <input
                                         id="company"
                                         name="company"
                                         type="text"
-                                        placeholder="e.g. Google"
                                         value={formData.company}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "company"
-                                        )}
+                                        className={inputClass("company")}
                                     />
 
                                     {errors.company && (
@@ -268,28 +364,22 @@ function AddApplication() {
                                     )}
                                 </div>
 
-                                {/* Position */}
                                 <div>
                                     <label
                                         htmlFor="position"
                                         className="text-sm font-semibold text-slate-700"
                                     >
                                         Position{" "}
-                                        <span className="text-red-500">
-                                            *
-                                        </span>
+                                        <span className="text-red-500">*</span>
                                     </label>
 
                                     <input
                                         id="position"
                                         name="position"
                                         type="text"
-                                        placeholder="e.g. Frontend Developer"
                                         value={formData.position}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "position"
-                                        )}
+                                        className={inputClass("position")}
                                     />
 
                                     {errors.position && (
@@ -299,28 +389,22 @@ function AddApplication() {
                                     )}
                                 </div>
 
-                                {/* Location */}
                                 <div>
                                     <label
                                         htmlFor="location"
                                         className="text-sm font-semibold text-slate-700"
                                     >
                                         Location{" "}
-                                        <span className="text-red-500">
-                                            *
-                                        </span>
+                                        <span className="text-red-500">*</span>
                                     </label>
 
                                     <input
                                         id="location"
                                         name="location"
                                         type="text"
-                                        placeholder="e.g. Bangalore / Remote"
                                         value={formData.location}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "location"
-                                        )}
+                                        className={inputClass("location")}
                                     />
 
                                     {errors.location && (
@@ -330,16 +414,13 @@ function AddApplication() {
                                     )}
                                 </div>
 
-                                {/* Job Type */}
                                 <div>
                                     <label
                                         htmlFor="jobType"
                                         className="text-sm font-semibold text-slate-700"
                                     >
                                         Job Type{" "}
-                                        <span className="text-red-500">
-                                            *
-                                        </span>
+                                        <span className="text-red-500">*</span>
                                     </label>
 
                                     <select
@@ -347,29 +428,20 @@ function AddApplication() {
                                         name="jobType"
                                         value={formData.jobType}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "jobType"
-                                        )}
+                                        className={inputClass("jobType")}
                                     >
-                                        <option
-                                            value=""
-                                            disabled
-                                        >
+                                        <option value="" disabled>
                                             Select job type
                                         </option>
-
                                         <option value="Full-time">
                                             Full-time
                                         </option>
-
                                         <option value="Internship">
                                             Internship
                                         </option>
-
                                         <option value="Part-time">
                                             Part-time
                                         </option>
-
                                         <option value="Contract">
                                             Contract
                                         </option>
@@ -384,7 +456,7 @@ function AddApplication() {
                             </div>
                         </section>
 
-                        {/* Application Status */}
+                        {/* Status */}
                         <section className="mt-10 border-t border-slate-100 pt-8">
                             <div className="mb-5 flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
@@ -403,16 +475,13 @@ function AddApplication() {
                             </div>
 
                             <div className="grid gap-5 sm:grid-cols-2">
-                                {/* Status */}
                                 <div>
                                     <label
                                         htmlFor="status"
                                         className="text-sm font-semibold text-slate-700"
                                     >
                                         Current Status{" "}
-                                        <span className="text-red-500">
-                                            *
-                                        </span>
+                                        <span className="text-red-500">*</span>
                                     </label>
 
                                     <select
@@ -420,37 +489,26 @@ function AddApplication() {
                                         name="status"
                                         value={formData.status}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "status"
-                                        )}
+                                        className={inputClass("status")}
                                     >
-                                        <option
-                                            value=""
-                                            disabled
-                                        >
+                                        <option value="" disabled>
                                             Select status
                                         </option>
-
                                         <option value="Applied">
                                             Applied
                                         </option>
-
                                         <option value="Interview">
                                             Interview
                                         </option>
-
                                         <option value="Assessment">
                                             Assessment
                                         </option>
-
                                         <option value="Offer">
                                             Offer
                                         </option>
-
                                         <option value="Rejected">
                                             Rejected
                                         </option>
-
                                         <option value="Withdrawn">
                                             Withdrawn
                                         </option>
@@ -463,7 +521,6 @@ function AddApplication() {
                                     )}
                                 </div>
 
-                                {/* Salary */}
                                 <div>
                                     <label
                                         htmlFor="salary"
@@ -482,13 +539,8 @@ function AddApplication() {
                                             name="salary"
                                             type="number"
                                             min="0"
-                                            placeholder="e.g. 800000"
-                                            value={
-                                                formData.salary
-                                            }
-                                            onChange={
-                                                handleChange
-                                            }
+                                            value={formData.salary}
+                                            onChange={handleChange}
                                             className={`${inputClass(
                                                 "salary"
                                             )} pl-9`}
@@ -529,9 +581,7 @@ function AddApplication() {
                                         id="appliedDate"
                                         name="appliedDate"
                                         type="date"
-                                        value={
-                                            formData.appliedDate
-                                        }
+                                        value={formData.appliedDate}
                                         onChange={handleChange}
                                         className="mt-2 w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                                     />
@@ -549,9 +599,7 @@ function AddApplication() {
                                         id="deadline"
                                         name="deadline"
                                         type="date"
-                                        value={
-                                            formData.deadline
-                                        }
+                                        value={formData.deadline}
                                         onChange={handleChange}
                                         className="mt-2 w-full rounded-xl border border-rose-100 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10"
                                     />
@@ -559,7 +607,7 @@ function AddApplication() {
                             </div>
                         </section>
 
-                        {/* Job Posting */}
+                        {/* Job URL */}
                         <section className="mt-10 border-t border-slate-100 pt-8">
                             <div className="mb-5 flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
@@ -582,9 +630,7 @@ function AddApplication() {
                                 className="text-sm font-semibold text-slate-700"
                             >
                                 Job URL{" "}
-                                <span className="text-red-500">
-                                    *
-                                </span>
+                                <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -596,6 +642,7 @@ function AddApplication() {
                                 onChange={handleChange}
                                 className={inputClass("jobUrl")}
                             />
+
                             {errors.jobUrl && (
                                 <p className="mt-2 text-xs font-medium text-red-600">
                                     {errors.jobUrl}
@@ -603,7 +650,7 @@ function AddApplication() {
                             )}
                         </section>
 
-                        {/* Description & Notes */}
+                        {/* Additional Information */}
                         <section className="mt-10 border-t border-slate-100 pt-8">
                             <div className="mb-5 flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
@@ -622,7 +669,6 @@ function AddApplication() {
                             </div>
 
                             <div className="space-y-5">
-                                {/* Description */}
                                 <div>
                                     <label
                                         htmlFor="description"
@@ -635,18 +681,12 @@ function AddApplication() {
                                         id="description"
                                         name="description"
                                         rows="5"
-                                        placeholder="Add the job description or important requirements..."
-                                        value={
-                                            formData.description
-                                        }
+                                        value={formData.description}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "description"
-                                        )}
+                                        className={inputClass("description")}
                                     />
                                 </div>
 
-                                {/* Notes */}
                                 <div>
                                     <label
                                         htmlFor="notes"
@@ -659,16 +699,12 @@ function AddApplication() {
                                         id="notes"
                                         name="notes"
                                         rows="5"
-                                        placeholder="Add your notes, preparation points, or follow-up reminders..."
                                         value={formData.notes}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "notes"
-                                        )}
+                                        className={inputClass("notes")}
                                     />
                                 </div>
 
-                                {/* Contact */}
                                 <div>
                                     <label
                                         htmlFor="contact"
@@ -681,12 +717,9 @@ function AddApplication() {
                                         id="contact"
                                         name="contact"
                                         type="text"
-                                        placeholder="e.g. recruiter@example.com"
                                         value={formData.contact}
                                         onChange={handleChange}
-                                        className={inputClass(
-                                            "contact"
-                                        )}
+                                        className={inputClass("contact")}
                                     />
                                 </div>
                             </div>
@@ -695,7 +728,7 @@ function AddApplication() {
                         {/* Actions */}
                         <div className="mt-10 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                             <Link
-                                to="/applications"
+                                to={`/applications/${id}`}
                                 className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
                             >
                                 Cancel
@@ -703,18 +736,18 @@ function AddApplication() {
 
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={saving}
                                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {loading ? (
+                                {saving ? (
                                     <>
                                         <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                                        Adding...
+                                        Saving...
                                     </>
                                 ) : (
                                     <>
-                                        <span>+</span>
-                                        Add Application
+                                        <span>✓</span>
+                                        Save Changes
                                     </>
                                 )}
                             </button>
@@ -722,14 +755,12 @@ function AddApplication() {
                     </form>
                 </div>
 
-                {/* Footer */}
                 <p className="py-6 text-center text-xs text-slate-400">
-                    Keep your job search organized, one application
-                    at a time.
+                    Keep your application information up to date.
                 </p>
             </div>
         </div>
     );
 }
 
-export default AddApplication;
+export default EditApplication;

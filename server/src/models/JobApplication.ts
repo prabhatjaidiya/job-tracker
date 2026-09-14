@@ -42,6 +42,8 @@ const jobApplicationSchema = new mongoose.Schema(
 
         jobUrl: {
             type: String,
+            required: true,
+            trim: true,
         },
 
         appliedDate: {
@@ -73,6 +75,11 @@ const jobApplicationSchema = new mongoose.Schema(
     {
         timestamps: true,
     }
+);
+
+jobApplicationSchema.index(
+    { user: 1, jobUrl: 1 },
+    { unique: true }
 );
 
 const JobApplication = mongoose.model(
