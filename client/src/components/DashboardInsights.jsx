@@ -74,7 +74,7 @@ const DashboardInsights = ({ stats, applicationTrendData }) => {
                             </p>
                         </div>
                     ) : (
-                        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                        <div className="grid gap-4 grid-cols-2 xl:grid-cols-4">
                             {/* Interview Activity */}
                             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
                                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-100 text-lg">

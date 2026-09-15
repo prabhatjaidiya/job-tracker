@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ApplicationTrend from "../components/ApplicationTrend";
 import Charts from "../components/Charts";
 import DashboardInsights from "../components/DashboardInsights";
+import UpcomingDeadlines from "../components/UpcomingDeadlines";
 
 function Dashboard() {
     const [loading, setLoading] = useState(true);
@@ -424,7 +425,7 @@ function Dashboard() {
             </div>
 
             {/* Analytics */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                     {/* Analytics Header */}
                     <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
@@ -456,7 +457,7 @@ function Dashboard() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 self-start rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 lg:self-auto">
+                        <div className="flex items-center gap-2 whitespace-nowrap self-start rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 lg:self-auto">
                             <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
 
                             <span className="text-sm font-semibold text-blue-700">
@@ -474,6 +475,7 @@ function Dashboard() {
                 />
             </div>
             <DashboardInsights stats={stats} applicationTrendData={applicationTrendData} />
+            <UpcomingDeadlines />
         </section>
     );
 }
