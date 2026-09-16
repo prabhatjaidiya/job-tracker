@@ -9,6 +9,18 @@ function ApplicationDetails() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [deleting, setDeleting] = useState(false);
+    const [notes, setNotes] = useState("");
+    const [savingNotes, setSavingNotes] = useState(false);
+    const [notesMessage, setNotesMessage] = useState("");
+    const [activities, setActivities] = useState([]);
+    const [activitiesLoading, setActivitiesLoading] = useState(false);
+    const [activitiesError, setActivitiesError] = useState("");
+    const [activityType, setActivityType] = useState(
+        "APPLICATION_UPDATED"
+    );
+    const [activityDescription, setActivityDescription] = useState("");
+    const [addingActivity, setAddingActivity] = useState(false);
+    const [activityMessage, setActivityMessage] = useState("");
 
     useEffect(() => {
         const fetchApplication = async () => {
@@ -43,6 +55,7 @@ function ApplicationDetails() {
                 }
 
                 setApplication(data.data);
+                setNotes(data.data.notes || "");
             } catch (error) {
                 setError("Unable to connect to the server.");
                 console.error(
@@ -173,10 +186,143 @@ function ApplicationDetails() {
         }
     };
 
+    const handleSaveNotes = async () => {
+        setSavingNotes(true);
+        setNotesMessage("");
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/applications/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        notes,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setNotesMessage(
+                    data.message || "Failed to save notes."
+                );
+                return;
+            }
+
+            setApplication((previousApplication) => ({
+                ...previousApplication,
+                notes,
+            }));
+
+            setNotesMessage("Notes saved.");
+        } catch (error) {
+            console.error("Failed to save notes:", error);
+            setNotesMessage("Unable to connect to the server.");
+        } finally {
+            setSavingNotes(false);
+        }
+    };
+
+    const fetchActivities = async () => {
+        setActivitiesLoading(true);
+        setActivitiesError("");
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/applications/${id}/activities`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setActivitiesError(
+                    data.message || "Failed to fetch activities."
+                );
+                return;
+            }
+
+            setActivities(data);
+        } catch (error) {
+            console.error("Failed to fetch activities:", error);
+            setActivitiesError("Unable to connect to the server.");
+        } finally {
+            setActivitiesLoading(false);
+        }
+    };
+
+    const handleAddActivity = async () => {
+        if (!activityDescription.trim()) {
+            setActivityMessage("Activity description is required.");
+            return;
+        }
+
+        setAddingActivity(true);
+        setActivityMessage("");
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/applications/${id}/activities`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        type: activityType,
+                        description: activityDescription.trim(),
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setActivityMessage(
+                    data.message || "Failed to add activity."
+                );
+                return;
+            }
+
+            setActivityDescription("");
+            setActivityMessage("Activity added successfully.");
+
+            await fetchActivities();
+        } catch (error) {
+            console.error("Failed to add activity:", error);
+            setActivityMessage("Unable to connect to the server.");
+        } finally {
+            setAddingActivity(false);
+        }
+    };
+
+    useEffect(() => {
+        if (id) {
+            fetchActivities();
+        }
+    }, [id]);
+
     if (loading) {
         return (
-            <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
-                <div className="mx-auto max-w-5xl">
+            <div className="min-h-full w-full overflow-x-hidden bg-slate-50 p-3 sm:p-5 lg:p-8">
+                <div className="mx-auto w-full max-w-6xl">
                     <div className="h-5 w-36 animate-pulse rounded bg-slate-200" />
 
                     <div className="mt-5 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -236,8 +382,8 @@ function ApplicationDetails() {
     const statusStyles = getStatusStyles(application.status);
 
     return (
-        <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
-            <div className="mx-auto max-w-5xl">
+        <div className="min-h-full w-full overflow-x-hidden bg-slate-50 p-3 sm:p-5 lg:p-8">
+            <div className="mx-auto w-full max-w-6xl">
                 {/* Back Navigation */}
                 <Link
                     to="/applications"
@@ -260,7 +406,7 @@ function ApplicationDetails() {
                         <div className="absolute -right-10 -top-20 h-52 w-52 rounded-full bg-white/10" />
                         <div className="absolute -bottom-24 right-32 h-48 w-48 rounded-full bg-white/5" />
 
-                        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                             <div className="flex min-w-0 items-center gap-4">
                                 {/* Company Avatar */}
                                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white text-2xl font-bold text-slate-800 shadow-lg sm:h-20 sm:w-20 sm:text-3xl">
@@ -285,10 +431,10 @@ function ApplicationDetails() {
                             </div>
 
                             {/* Status */}
-                            <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
                                 <Link
                                     to={`/applications/${id}/edit`}
-                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-md transition hover:-translate-y-0.5 hover:bg-slate-50"
+                                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 shadow-md transition hover:-translate-y-0.5 hover:bg-slate-50 sm:px-4"
                                 >
                                     <span>✎</span>
                                     Edit
@@ -512,11 +658,251 @@ function ApplicationDetails() {
                                     </div>
                                 </div>
 
-                                <p className="whitespace-pre-wrap break-words text-sm leading-7 text-slate-600">
-                                    {application.notes ||
-                                        "No notes added."}
-                                </p>
+                                <textarea
+                                    value={notes}
+                                    onChange={(event) => {
+                                        setNotes(event.target.value);
+                                        setNotesMessage("");
+                                    }}
+                                    placeholder="Add notes about this application..."
+                                    rows={6}
+                                    className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-amber-400 focus:bg-white focus:ring-2 focus:ring-amber-100"
+                                />
+
+                                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="text-sm">
+                                        {notesMessage && (
+                                            <p
+                                                className={
+                                                    notesMessage === "Notes saved."
+                                                        ? "text-emerald-600"
+                                                        : "text-red-600"
+                                                }
+                                            >
+                                                {notesMessage}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleSaveNotes}
+                                        disabled={savingNotes}
+                                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-amber-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        {savingNotes ? (
+                                            <>
+                                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>✓</span>
+                                                Save Notes
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                        {/* Activity Timeline */}
+                        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+                            <div className="mb-6 flex items-center gap-3">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
+                                    ↗
+                                </div>
+
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                        History
+                                    </p>
+
+                                    <h2 className="font-bold text-slate-900">
+                                        Activity
+                                    </h2>
+                                </div>
+                            </div>
+
+                            {/* Add Activity Form */}
+                            <div className="mb-8 w-full min-w-0 rounded-2xl border border-violet-100 bg-violet-50/40 p-4 sm:p-5">
+                                <div className="mb-4">
+                                    <p className="text-sm font-bold text-slate-900">
+                                        Add Activity
+                                    </p>
+
+                                    <p className="mt-1 text-xs text-slate-500">
+                                        Record something that happened with this application.
+                                    </p>
+                                </div>
+
+                                <div className="grid gap-4">
+                                    {/* Activity Type */}
+                                    <div>
+                                        <label
+                                            htmlFor="activityType"
+                                            className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                        >
+                                            Activity Type
+                                        </label>
+
+                                        <select
+                                            id="activityType"
+                                            value={activityType}
+                                            onChange={(event) =>
+                                                setActivityType(event.target.value)
+                                            }
+                                            className="w-full min-w-0 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                                        >
+                                            <option value="APPLICATION_CREATED">
+                                                Application Created
+                                            </option>
+
+                                            <option value="STATUS_CHANGE">
+                                                Status Changed
+                                            </option>
+
+                                            <option value="APPLICATION_UPDATED">
+                                                Application Updated
+                                            </option>
+
+                                            <option value="NOTE_ADDED">
+                                                Note Added
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    {/* Activity Description */}
+                                    <div>
+                                        <label
+                                            htmlFor="activityDescription"
+                                            className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                        >
+                                            Description
+                                        </label>
+
+                                        <textarea
+                                            id="activityDescription"
+                                            value={activityDescription}
+                                            onChange={(event) => {
+                                                setActivityDescription(event.target.value);
+                                                setActivityMessage("");
+                                            }}
+                                            placeholder="e.g. Recruiter called about the interview."
+                                            rows={4}
+                                            className="w-full min-w-0 resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                                        />
+                                    </div>
+
+                                    {/* Message + Button */}
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                        <div className="min-w-0">
+                                            {activityMessage && (
+                                                <p
+                                                    className={
+                                                        activityMessage ===
+                                                            "Activity added successfully."
+                                                            ? "text-sm text-emerald-600"
+                                                            : "text-sm text-red-600"
+                                                    }
+                                                >
+                                                    {activityMessage}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleAddActivity}
+                                            disabled={addingActivity}
+                                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                                        >
+                                            {addingActivity ? (
+                                                <>
+                                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                                                    Adding...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>+</span>
+                                                    Add Activity
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {activitiesLoading ? (
+                                <div className="space-y-5">
+                                    <div className="flex gap-4">
+                                        <div className="h-3 w-3 shrink-0 animate-pulse rounded-full bg-slate-200" />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+                                            <div className="h-3 w-1/3 animate-pulse rounded bg-slate-100" />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-4">
+                                        <div className="h-3 w-3 shrink-0 animate-pulse rounded-full bg-slate-200" />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                                            <div className="h-3 w-1/4 animate-pulse rounded bg-slate-100" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : activitiesError ? (
+                                <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                                    <p className="text-sm font-medium text-red-700">
+                                        {activitiesError}
+                                    </p>
+                                </div>
+                            ) : activities.length === 0 ? (
+                                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+                                    <p className="text-sm font-medium text-slate-500">
+                                        No activity yet.
+                                    </p>
+
+                                    <p className="mt-1 text-xs text-slate-400">
+                                        Activity related to this application will appear here.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="relative">
+                                    {/* Timeline line */}
+                                    <div className="absolute bottom-0 left-[5px] top-0 w-px bg-slate-200" />
+
+                                    <div className="space-y-6">
+                                        {activities.map((activity) => (
+                                            <div
+                                                key={activity._id}
+                                                className="relative flex min-w-0 gap-3 sm:gap-4"
+                                            >
+                                                {/* Timeline dot */}
+                                                <div className="relative z-10 mt-1.5 h-3 w-3 shrink-0 rounded-full bg-violet-500 ring-4 ring-white" />
+
+                                                {/* Activity content */}
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="break-words text-sm font-semibold text-slate-900">
+                                                        {activity.description}
+                                                    </p>
+
+                                                    <p className="mt-1 text-xs text-slate-400">
+                                                        {new Date(
+                                                            activity.createdAt
+                                                        ).toLocaleString("en-US", {
+                                                            month: "short",
+                                                            day: "numeric",
+                                                            year: "numeric",
+                                                            hour: "numeric",
+                                                            minute: "2-digit",
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

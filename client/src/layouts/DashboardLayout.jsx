@@ -14,13 +14,33 @@ function DashboardLayout({ children }) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-100 md:flex">
-            <Sidebar
-                isOpen={sidebarOpen}
-                onClose={closeSidebar}
-            />
+        <div className="min-h-screen bg-slate-100 lg:flex">
+            {/* Desktop Sidebar */}
+            <div className="hidden lg:block">
+                <Sidebar
+                    isOpen={true}
+                    onClose={closeSidebar}
+                />
+            </div>
 
-            <div className="min-w-0 flex-1 h-screen flex flex-col overflow-hidden">
+            {/* Mobile / Tablet Sidebar */}
+            {sidebarOpen && (
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    <div
+                        className="absolute inset-0 bg-black/40"
+                        onClick={closeSidebar}
+                    />
+
+                    <div className="relative h-full w-72">
+                        <Sidebar
+                            isOpen={sidebarOpen}
+                            onClose={closeSidebar}
+                        />
+                    </div>
+                </div>
+            )}
+
+            <div className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
                 <Header onMenuClick={openSidebar} />
 
                 <main className="min-h-0 flex-1 overflow-y-auto">
