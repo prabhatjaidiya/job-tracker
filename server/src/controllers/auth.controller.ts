@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { generateResetToken } from "../utils/passwordReset.js";
+import { sendPasswordResetEmail } from "../services/email.service.js";
+import { createHash } from "node:crypto";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -116,6 +119,122 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
         res.status(500).json({
             message: "Server error",
+        });
+    }
+};
+
+
+export const forgotPassword = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const email =
+            typeof req.body.email === "string"
+                ? req.body.email.trim().toLowerCase()
+                : "";
+
+        if (!email) {
+            res.status(400).json({
+                message: "Email is required",
+            });
+            return;
+        }
+
+        const genericMessage =
+            "If an account with that email exists, a reset link has been sent.";
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            res.status(200).json({ message: genericMessage });
+            return;
+        }
+
+        const { resetToken, hashedToken } = generateResetToken();
+
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = new Date(
+            Date.now() + 15 * 60 * 1000
+        );
+
+        await user.save();
+
+        const clientUrl = process.env.CLIENT_URL;
+
+        if (!clientUrl) {
+            throw new Error("CLIENT_URL is not configured");
+        }
+
+        const resetUrl =
+            `${clientUrl.replace(/\/$/, "")}/reset-password/${resetToken}`;
+
+        await sendPasswordResetEmail(user.email, resetUrl);
+
+        res.status(200).json({ message: genericMessage });
+    } catch (error) {
+        console.error("Forgot password error:", error);
+
+        res.status(500).json({
+            message: "Unable to process password reset request",
+        });
+    }
+};
+
+
+export const resetPassword = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (typeof token !== "string" || !token) {
+            res.status(400).json({
+                message: "Reset token is required",
+            });
+            return;
+        }
+
+        if (typeof password !== "string" || password.length < 6) {
+            res.status(400).json({
+                message: "Password must be at least 6 characters",
+            });
+            return;
+        }
+
+        const hashedToken = createHash("sha256")
+            .update(token)
+            .digest("hex");
+
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: { $gt: new Date() },
+        });
+
+        if (!user) {
+            res.status(400).json({
+                message: "Reset link is invalid or has expired",
+            });
+            return;
+        }
+
+        user.password = await bcrypt.hash(password, 10);
+
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Password has been reset successfully",
+        });
+    } catch (error) {
+        console.error("Reset password error:", error);
+
+        res.status(500).json({
+            message: "Unable to reset password",
         });
     }
 };

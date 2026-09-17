@@ -10,6 +10,8 @@ function Register() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -65,7 +67,7 @@ function Register() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-            <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
+            <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-md sm:p-8">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-900">
                         Job Tracker
@@ -94,7 +96,7 @@ function Register() {
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Enter your name"
                             required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                         />
                     </div>
 
@@ -104,7 +106,7 @@ function Register() {
                             htmlFor="email"
                             className="mb-2 block text-sm font-medium text-gray-700"
                         >
-                            Email
+                            Name <span className="text-red-500">*</span>
                         </label>
 
                         <input
@@ -115,7 +117,7 @@ function Register() {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
                             required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                         />
                     </div>
 
@@ -127,17 +129,27 @@ function Register() {
                         >
                             Password
                         </label>
-
-                        <input
-                            id="password"
-                            type="password"
-                            name="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter your password"
-                            required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                        />
+                        <div className="relative">
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                required
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                aria-pressed={showPassword}
+                                className="absolute inset-y-0 right-3 rounded-sm text-sm font-semibold text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Confirm Password */}
@@ -149,28 +161,47 @@ function Register() {
                             Confirm Password
                         </label>
 
-                        <input
-                            id="confirmPassword"
-                            type="password"
-                            name="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm your password"
-                            required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                        />
+                        <div className="relative">
+                            <input
+                                id="confirmPassword"
+                                type={showConfirmPassword ? "text" : "password"}
+                                name="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Confirm your password"
+                                required
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                                aria-pressed={showConfirmPassword}
+                                className="absolute inset-y-0 right-3 rounded-sm text-sm font-semibold text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                            >
+                                {showConfirmPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Error */}
                     {error && (
-                        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                        <div
+                            role="alert"
+                            aria-live="polite"
+                            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600"
+                        >
                             {error}
                         </div>
                     )}
 
                     {/* Success */}
                     {success && (
-                        <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-600">
+                        <div
+                            role="alert"
+                            aria-live="polite"
+                            className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4"
+                        >
                             {success}
                         </div>
                     )}
@@ -179,7 +210,7 @@ function Register() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-sm font-semibold text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
                     >
                         {loading ? "Creating account..." : "Register"}
                     </button>

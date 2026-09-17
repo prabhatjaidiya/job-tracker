@@ -279,7 +279,7 @@ function Applications() {
 
     return (
         <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
-            <div className="mx-auto max-w-6xl">
+            <div className="w-full">
                 {/* Page Header */}
                 <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                     <div>
@@ -344,7 +344,8 @@ function Applications() {
                 {/* Main Card */}
                 <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
                     {/* Card Header */}
-                    <div className="border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-blue-50/40 px-6 py-5 sm:px-8">
+
+                    <div className="border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-blue-50/40 px-4 py-5 sm:px-6 lg:px-8">
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
@@ -367,9 +368,9 @@ function Applications() {
                             </div>
 
                             {/* Search + Filters */}
-                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
                                 {/* Search */}
-                                <div className="relative sm:col-span-2 lg:col-span-1">
+                                <div className="relative sm:col-span-2 xl:col-span-1">
                                     <label
                                         htmlFor="application-search"
                                         className="sr-only"
@@ -691,106 +692,99 @@ function Applications() {
                                 return (
                                     <div
                                         key={application._id}
-                                        className="group relative p-5 transition duration-200 hover:bg-slate-50/70 sm:p-6"
+                                        className="group relative p-4 transition duration-200 hover:bg-slate-50/70 sm:p-5 lg:p-6"
                                     >
                                         {/* Status Accent */}
                                         <div
                                             className={`absolute bottom-0 left-0 top-0 w-1 bg-gradient-to-b ${statusStyles.accent} opacity-0 transition group-hover:opacity-100`}
                                         />
 
-                                        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+                                        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+
                                             {/* Company + Position */}
                                             <div className="flex min-w-0 items-start gap-4">
                                                 <div
                                                     className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${statusStyles.accent} text-lg font-bold text-white shadow-sm`}
                                                 >
-                                                    {getCompanyInitial(
-                                                        application.company
-                                                    )}
+                                                    {getCompanyInitial(application.company)}
                                                 </div>
 
-                                                <div className="min-w-0">
-                                                    <h3 className="truncate text-base font-bold text-slate-900 sm:text-lg">
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="break-words text-base font-bold text-slate-900 sm:text-lg">
                                                         {application.position}
                                                     </h3>
 
-                                                    <p className="mt-1 truncate text-sm font-medium text-slate-500">
+                                                    <p className="mt-1 break-words text-sm font-medium text-slate-500">
                                                         {application.company}
                                                     </p>
 
                                                     <div className="mt-3 flex flex-wrap items-center gap-2">
                                                         {application.location && (
                                                             <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                                                                📍{" "}
-                                                                {application.location}
+                                                                📍 {application.location}
                                                             </span>
                                                         )}
 
                                                         {application.jobType && (
                                                             <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                                                                💼{" "}
-                                                                {application.jobType}
+                                                                💼 {application.jobType}
                                                             </span>
                                                         )}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Status */}
-                                            <div className="lg:w-32">
-                                                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                                    Status
-                                                </p>
 
-                                                <span
-                                                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${statusStyles.badge}`}
-                                                >
+                                            {/* Status + Dates + View Details */}
+                                            <div className="grid grid-cols-2 items-center gap-4 sm:grid-cols-4 sm:gap-3">
+
+                                                {/* Status */}
+                                                <div className="col-span-2 min-w-0 sm:col-span-1">
+                                                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                        Status
+                                                    </p>
+
                                                     <span
-                                                        className={`h-2 w-2 rounded-full ${statusStyles.dot}`}
-                                                    />
+                                                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${statusStyles.badge}`}
+                                                    >
+                                                        <span
+                                                            className={`h-2 w-2 shrink-0 rounded-full ${statusStyles.dot}`}
+                                                        />
+                                                        {application.status}
+                                                    </span>
+                                                </div>
 
-                                                    {application.status}
-                                                </span>
-                                            </div>
-
-                                            {/* Dates */}
-                                            <div className="grid grid-cols-2 gap-6 sm:flex sm:items-center sm:gap-8 lg:w-64">
-                                                <div>
+                                                {/* Applied Date */}
+                                                <div className="min-w-0">
                                                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                                                         Applied
                                                     </p>
 
                                                     <p className="mt-1 text-sm font-semibold text-slate-900">
-                                                        {formatDate(
-                                                            application.appliedDate
-                                                        )}
+                                                        {formatDate(application.appliedDate)}
                                                     </p>
                                                 </div>
 
-                                                <div>
+                                                {/* Deadline */}
+                                                <div className="min-w-0">
                                                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                                                         Deadline
                                                     </p>
 
                                                     <p className="mt-1 text-sm font-semibold text-slate-900">
-                                                        {formatDate(
-                                                            application.deadline
-                                                        )}
+                                                        {formatDate(application.deadline)}
                                                     </p>
                                                 </div>
+
+                                                {/* View Details */}
+                                                <Link
+                                                    to={`/applications/${application._id}`}
+                                                    className="col-span-2 inline-flex min-h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 sm:col-span-1"
+                                                >
+                                                    View Details →
+                                                </Link>
                                             </div>
-
-                                            {/* View */}
-                                            <Link
-                                                to={`/applications/${application._id}`}
-                                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 hover:shadow-md lg:w-auto"
-                                            >
-                                                View Details
-
-                                                <span className="transition-transform group-hover:translate-x-0.5">
-                                                    →
-                                                </span>
-                                            </Link>
                                         </div>
                                     </div>
                                 );

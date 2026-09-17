@@ -10,6 +10,7 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -61,7 +62,7 @@ function Login() {
                             htmlFor="email"
                             className="mb-2 block text-sm font-medium text-gray-700"
                         >
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </label>
 
                         <input
@@ -72,7 +73,7 @@ function Login() {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
                             required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                         />
                     </div>
 
@@ -84,20 +85,42 @@ function Login() {
                             Password
                         </label>
 
-                        <input
-                            id="password"
-                            type="password"
-                            name="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter your password"
-                            required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                        />
+                        <div className="relative">
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                required
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                aria-pressed={showPassword}
+                                className="absolute inset-y-0 right-3 text-sm font-semibold text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-sm"
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
+                        <Link
+                            to="/forgot-password"
+                            className="text-sm font-medium text-blue-600 hover:underline"
+                        >
+                            Forgot password?
+                        </Link>
                     </div>
 
                     {error && (
-                        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                        <div
+                            role="alert"
+                            aria-live="polite"
+                            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600"
+                        >
                             {error}
                         </div>
                     )}
@@ -105,7 +128,7 @@ function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-sm font-semibold text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
                     >
                         {loading ? "Logging in..." : "Login"}
                     </button>

@@ -45,6 +45,10 @@ function AddApplication() {
             newErrors.status = "Status is required";
         }
 
+        if (!formData.jobUrl.trim()) {
+            newErrors.jobUrl = "Job URL is required";
+        }
+
         setErrors(newErrors);
 
         return Object.keys(newErrors).length === 0;
@@ -118,9 +122,9 @@ function AddApplication() {
     };
 
     const inputClass = (field) => {
-        return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 ${errors[field]
-            ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
-            : "border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+        return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 transition placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-4 ${errors[field]
+            ? "border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/10"
+            : "border-slate-200 focus-visible:border-blue-500 focus-visible:ring-blue-500/10"
             }`;
     };
 
@@ -256,13 +260,18 @@ function AddApplication() {
                                         placeholder="e.g. Google"
                                         value={formData.company}
                                         onChange={handleChange}
+                                        aria-invalid={Boolean(errors.company)}
+                                        aria-describedby={errors.company ? "company-error" : undefined}
                                         className={inputClass(
                                             "company"
                                         )}
                                     />
 
                                     {errors.company && (
-                                        <p className="mt-2 text-xs font-medium text-red-600">
+                                        <p
+                                            id="company-error"
+                                            className="mt-2 text-xs font-medium text-red-600"
+                                        >
                                             {errors.company}
                                         </p>
                                     )}
@@ -704,7 +713,7 @@ function AddApplication() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                             >
                                 {loading ? (
                                     <>

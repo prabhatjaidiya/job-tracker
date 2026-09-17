@@ -75,16 +75,9 @@ function Sidebar({ isOpen, onClose }) {
 
     return (
         <>
-            {/* Mobile overlay */}
-            {isOpen && (
-                <div
-                    className="fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-sm md:hidden"
-                    onClick={onClose}
-                />
-            )}
-
             <aside
-                className={`fixed inset-y-0 h-screen left-0 z-40 flex w-64 flex-col overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 text-white shadow-2xl transition-transform duration-300 md:static md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+
+                className={`fixed inset-y-0 left-0 z-40 flex h-screen w-64 flex-col overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 text-white shadow-2xl transition-transform duration-300 lg:static lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 {/* Decorative glow */}
@@ -137,7 +130,7 @@ function Sidebar({ isOpen, onClose }) {
                             end={item.to === "/applications"}
                             onClick={onClose}
                             className={({ isActive }) =>
-                                `group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ${isActive
+                                `group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white ${isActive
                                     ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-900/30"
                                     : "text-slate-400 hover:bg-white/5 hover:text-white"
                                 }`
@@ -152,8 +145,8 @@ function Sidebar({ isOpen, onClose }) {
 
                                     <span
                                         className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${isActive
-                                                ? "bg-white/15 text-white"
-                                                : "bg-slate-800/70 text-slate-400 group-hover:bg-slate-700 group-hover:text-white"
+                                            ? "bg-white/15 text-white"
+                                            : "bg-slate-800/70 text-slate-400 group-hover:bg-slate-700 group-hover:text-white"
                                             }`}
                                     >
                                         {item.icon}
