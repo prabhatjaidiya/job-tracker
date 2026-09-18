@@ -336,7 +336,7 @@ function UpcomingDeadlines() {
                                     <div className="my-5 border-t border-slate-100" />
 
                                     {/* Bottom */}
-                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                                    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                                                 <CalendarIcon className="h-5 w-5" />
@@ -364,7 +364,7 @@ function UpcomingDeadlines() {
 
                                         <Link
                                             to={`/applications/${application._id}`}
-                                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 xl:w-auto"
                                         >
                                             View Details
                                             <span className="text-base transition-transform group-hover:translate-x-0.5">
