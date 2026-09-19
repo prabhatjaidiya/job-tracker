@@ -103,12 +103,42 @@ export const updateApplication = async (
     res: Response
 ): Promise<void> => {
     try {
+        const {
+            company,
+            position,
+            location,
+            jobType,
+            status,
+            salary,
+            jobUrl,
+            appliedDate,
+            deadline,
+            description,
+            notes,
+            contact,
+        } = req.body;
+
+        const updates = {
+            company,
+            position,
+            location,
+            jobType,
+            status,
+            salary,
+            jobUrl,
+            appliedDate,
+            deadline,
+            description,
+            notes,
+            contact,
+        };
+
         const application = await JobApplication.findOneAndUpdate(
             {
                 _id: req.params.id,
                 user: req.user._id,
             },
-            req.body,
+            updates,
             {
                 new: true,
                 runValidators: true,

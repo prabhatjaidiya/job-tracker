@@ -69,7 +69,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const user = await User.findOne({ email });
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const user = await User.findOne({
+            email: normalizedEmail,
+        }).select("+password");
 
         if (!user) {
             res.status(401).json({
