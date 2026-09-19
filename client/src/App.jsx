@@ -11,6 +11,7 @@ import ApplicationDetails from "./pages/ApplicationDetails";
 import EditApplication from "./pages/EditApplication";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 function App() {
     return (
@@ -64,6 +65,15 @@ function App() {
                 <Route
                     path="/applications/:id/edit"
                     element={<EditApplication />}
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <DashboardLayout>
+                            <Profile />
+                        </DashboardLayout>
+                    }
                 />
             </Route>
 

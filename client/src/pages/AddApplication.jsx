@@ -93,7 +93,6 @@ function AddApplication() {
             }
 
             setSuccess("Application added successfully.");
-            console.log(data);
         } catch (error) {
             setApiError("Unable to connect to the server.");
             console.error(

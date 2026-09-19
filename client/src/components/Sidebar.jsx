@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/useAuth.js";
 
 function Sidebar({ isOpen, onClose }) {
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
     const navItems = [
         {
             to: "/dashboard",
@@ -70,7 +70,7 @@ function Sidebar({ isOpen, onClose }) {
                     />
                 </svg>
             ),
-        },
+        }
     ];
 
     return (
@@ -181,21 +181,47 @@ function Sidebar({ isOpen, onClose }) {
                     <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
 
                     {/* User card */}
-                    <div className="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-sm font-bold text-white shadow-md">
-                            U
+                    <NavLink
+                        to="/profile"
+                        onClick={onClose}
+                        className="group flex items-center gap-3 rounded-xl bg-white/5 p-3 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                    >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-sm font-bold text-white shadow-md">
+                            {user?.profilePhoto ? (
+                                <img
+                                    src={user.profilePhoto}
+                                    alt={`${user.name || "User"}'s profile`}
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                user?.name?.trim()?.charAt(0).toUpperCase() || "U"
+                            )}
                         </div>
 
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-white">
-                                Test User
+                                {user?.name || "User"}
                             </p>
 
                             <p className="truncate text-xs text-slate-500">
-                                Job seeker
+                                {user?.email || ""}
                             </p>
                         </div>
-                    </div>
+
+                        <svg
+                            className="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-1 group-hover:text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9 5l7 7-7 7"
+                            />
+                        </svg>
+                    </NavLink>
 
                     {/* Logout */}
                     <button
