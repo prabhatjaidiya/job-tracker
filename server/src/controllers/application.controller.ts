@@ -64,9 +64,9 @@ export const getApplication = async (
 ): Promise<void> => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
-            res.status(404).json({
+            res.status(400).json({
                 success: false,
-                message: "Application not found",
+                message: "Invalid application ID",
             });
             return;
         }
@@ -103,6 +103,15 @@ export const updateApplication = async (
     res: Response
 ): Promise<void> => {
     try {
+
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(400).json({
+                success: false,
+                message: "Invalid application ID",
+            });
+            return;
+        }
+
         const {
             company,
             position,
@@ -180,6 +189,15 @@ export const deleteApplication = async (
     res: Response
 ): Promise<void> => {
     try {
+
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            res.status(400).json({
+                success: false,
+                message: "Invalid application ID",
+            });
+            return;
+        }
+
         const application = await JobApplication.findOneAndDelete({
             _id: req.params.id,
             user: req.user._id,

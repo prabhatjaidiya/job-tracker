@@ -12,6 +12,7 @@ const authMiddleware = async (
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             res.status(401).json({
+                success: false,
                 message: "No token provided",
             });
             return;
@@ -23,6 +24,7 @@ const authMiddleware = async (
 
         if (!jwtSecret) {
             res.status(500).json({
+                success: false,
                 message: "JWT secret is not configured",
             });
             return;
@@ -36,6 +38,7 @@ const authMiddleware = async (
 
         if (!user) {
             res.status(401).json({
+                success: false,
                 message: "User not found",
             });
             return;
@@ -45,11 +48,21 @@ const authMiddleware = async (
 
         next();
     } catch (error) {
-        console.error(error);
+        if (
+            error instanceof Error &&
+            (
+                error.name === "JsonWebTokenError" ||
+                error.name === "TokenExpiredError"
+            )
+        ) {
+            res.status(401).json({
+                success: false,
+                message: "Invalid or expired token",
+            });
+            return;
+        }
 
-        res.status(401).json({
-            message: "Invalid or expired token",
-        });
+        next(error);
     }
 };
 
