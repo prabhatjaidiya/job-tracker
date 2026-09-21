@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-
-const API_URL = "http://localhost:5000/api";
+import { useAuth } from "../context/useAuth.js";
+import { API_BASE_URL } from "../config/api.js";
 
 const Profile = () => {
     const { user, setUser, loading } = useAuth();
@@ -30,26 +29,13 @@ const Profile = () => {
 
     // Profile photo
     const fileInputRef = useRef(null);
-    const [photoPreview, setPhotoPreview] = useState("");
     const [photoSaving, setPhotoSaving] = useState(false);
     const [photoError, setPhotoError] = useState("");
     const [photoSuccess, setPhotoSuccess] = useState("");
 
-    // Keep edit fields synchronized with authenticated user.
-    useEffect(() => {
-        if (!user) return;
-
-        setName(user.name || "");
-        setEmail(user.email || "");
-    }, [user]);
-
     // Fetch user's applications.
     useEffect(() => {
-        if (!user) {
-            setApplications([]);
-            setApplicationsLoading(false);
-            return;
-        }
+        if (!user) return;
 
         const controller = new AbortController();
 
@@ -68,7 +54,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await fetch(`${API_URL}/applications`, {
+                const response = await fetch(`${API_BASE_URL}/applications`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -200,7 +186,7 @@ const Profile = () => {
         setSaving(true);
 
         try {
-            const response = await fetch(`${API_URL}/auth/profile`, {
+            const response = await fetch(`${API_BASE_URL}/auth/profile`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -299,7 +285,7 @@ const Profile = () => {
 
         try {
             const response = await fetch(
-                `${API_URL}/auth/change-password`,
+                `${API_BASE_URL}/auth/change-password`,
                 {
                     method: "PATCH",
                     headers: {
@@ -388,7 +374,7 @@ const Profile = () => {
             formData.append("profilePhoto", file);
 
             const response = await fetch(
-                `${API_URL}/auth/profile/photo`,
+                `${API_BASE_URL}/auth/profile/photo`,
                 {
                     method: "PATCH",
                     headers: {
@@ -411,7 +397,6 @@ const Profile = () => {
             }
 
             setUser?.(data.user);
-            setPhotoPreview("");
             setPhotoSuccess("Profile photo updated successfully.");
         } catch (error) {
             console.error("Profile photo upload error:", error);

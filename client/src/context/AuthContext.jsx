@@ -1,13 +1,6 @@
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-} from "react";
-
+import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContextValue.js";
-
-export const useAuth = () => useContext(AuthContext);
+import { API_BASE_URL } from "../config/api.js";
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -24,7 +17,7 @@ export function AuthProvider({ children }) {
 
             try {
                 const response = await fetch(
-                    "http://localhost:5000/api/auth/me",
+                    `${API_BASE_URL}/auth/me`,
                     {
                         method: "GET",
                         headers: {

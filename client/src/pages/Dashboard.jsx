@@ -5,6 +5,7 @@ import ApplicationTrend from "../components/ApplicationTrend";
 import Charts from "../components/Charts";
 import DashboardInsights from "../components/DashboardInsights";
 import UpcomingDeadlines from "../components/UpcomingDeadlines";
+import { API_BASE_URL } from "../config/api.js";
 
 function Dashboard() {
     const [loading, setLoading] = useState(true);
@@ -27,7 +28,7 @@ function Dashboard() {
                 const token = localStorage.getItem("token");
 
                 const response = await fetch(
-                    "http://localhost:5000/api/applications/stats",
+                    `${API_BASE_URL}/applications/stats`,
                     {
                         method: "GET",
                         headers: {
@@ -208,7 +209,13 @@ function Dashboard() {
                 <div className="flex h-full w-full items-center justify-center rounded-3xl border border-rose-200 bg-white p-10 shadow-sm">
                     <div className="flex flex-col items-center text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
-                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} >
+                            <svg
+                                className="h-7 w-7"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                            >
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.5m0 4h.01M10.3 3.8l-7.1 12.3A2 2 0 005 19h14a2 2 0 001.8-2.9L13.7 3.8a2 2 0 00-3.4 0z" />
                             </svg>
                         </div>
@@ -231,7 +238,7 @@ function Dashboard() {
                         </button>
                     </div>
                 </div>
-            </section >
+            </section>
         );
     }
 
@@ -474,7 +481,7 @@ function Dashboard() {
                     applicationTrendData={applicationTrendData}
                 />
             </div>
-            <DashboardInsights stats={stats} applicationTrendData={applicationTrendData} />
+            <DashboardInsights stats={stats} />
             <UpcomingDeadlines />
         </section>
     );

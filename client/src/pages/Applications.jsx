@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config/api.js";
 
 function Applications() {
     const [applications, setApplications] = useState([]);
@@ -21,7 +22,7 @@ function Applications() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                "http://localhost:5000/api/applications",
+                `${API_BASE_URL}/applications`,
                 {
                     method: "GET",
                     headers: {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config/api.js";
 
 function AddApplication() {
     const [errors, setErrors] = useState({});
@@ -71,7 +72,7 @@ function AddApplication() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                "http://localhost:5000/api/applications",
+                `${API_BASE_URL}/applications`,
                 {
                     method: "POST",
                     headers: {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config/api.js";
 
 const getDaysRemaining = (deadline) => {
     const today = new Date();
@@ -97,7 +98,7 @@ function UpcomingDeadlines() {
                 const token = localStorage.getItem("token");
 
                 const response = await fetch(
-                    "http://localhost:5000/api/applications",
+                    `${API_BASE_URL}/applications`,
                     {
                         method: "GET",
                         headers: {

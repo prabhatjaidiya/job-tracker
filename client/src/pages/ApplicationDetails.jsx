@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { API_BASE_URL } from "../config/api.js";
 
 function ApplicationDetails() {
     const { id } = useParams();
@@ -13,7 +14,7 @@ function ApplicationDetails() {
     const [savingNotes, setSavingNotes] = useState(false);
     const [notesMessage, setNotesMessage] = useState("");
     const [activities, setActivities] = useState([]);
-    const [activitiesLoading, setActivitiesLoading] = useState(false);
+    const [activitiesLoading, setActivitiesLoading] = useState(true);
     const [activitiesError, setActivitiesError] = useState("");
     const [activityType, setActivityType] = useState(
         "APPLICATION_UPDATED"
@@ -31,7 +32,7 @@ function ApplicationDetails() {
                 const token = localStorage.getItem("token");
 
                 const response = await fetch(
-                    `http://localhost:5000/api/applications/${id}`,
+                    `${API_BASE_URL}/applications/${id}`,
                     {
                         method: "GET",
                         headers: {
@@ -159,7 +160,7 @@ function ApplicationDetails() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `http://localhost:5000/api/applications/${id}`,
+                `${API_BASE_URL}/applications/${id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -194,7 +195,7 @@ function ApplicationDetails() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `http://localhost:5000/api/applications/${id}`,
+                `${API_BASE_URL}/applications/${id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -230,15 +231,12 @@ function ApplicationDetails() {
         }
     };
 
-    const fetchActivities = async () => {
-        setActivitiesLoading(true);
-        setActivitiesError("");
-
+    const fetchActivities = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `http://localhost:5000/api/applications/${id}/activities`,
+                `${API_BASE_URL}/applications/${id}/activities`,
                 {
                     method: "GET",
                     headers: {
@@ -263,7 +261,7 @@ function ApplicationDetails() {
         } finally {
             setActivitiesLoading(false);
         }
-    };
+    }, [id]);
 
     const handleAddActivity = async () => {
         if (!activityDescription.trim()) {
@@ -278,7 +276,7 @@ function ApplicationDetails() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `http://localhost:5000/api/applications/${id}/activities`,
+                `${API_BASE_URL}/applications/${id}/activities`,
                 {
                     method: "POST",
                     headers: {
@@ -314,10 +312,14 @@ function ApplicationDetails() {
     };
 
     useEffect(() => {
-        if (id) {
-            fetchActivities();
-        }
-    }, [id]);
+        if (!id) return;
+
+        const loadActivities = async () => {
+            await fetchActivities();
+        };
+
+        loadActivities();
+    }, [id, fetchActivities]);
 
     if (loading) {
         return (

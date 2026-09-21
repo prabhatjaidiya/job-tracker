@@ -181,7 +181,7 @@ export const updateProfile = async (
                 new: true,
                 runValidators: true,
             }
-        ).select("_id name email createdAt");
+        ).select("_id name email profilePhoto createdAt");
 
         if (!user) {
             res.status(404).json({

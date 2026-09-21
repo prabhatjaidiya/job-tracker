@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { API_BASE_URL } from "../config/api.js";
 
 function EditApplication() {
     const { id } = useParams();
@@ -35,7 +36,7 @@ function EditApplication() {
                 const token = localStorage.getItem("token");
 
                 const response = await fetch(
-                    `http://localhost:5000/api/applications/${id}`,
+                    `${API_BASE_URL}/applications/${id}`,
                     {
                         method: "GET",
                         headers: {
@@ -151,7 +152,7 @@ function EditApplication() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `http://localhost:5000/api/applications/${id}`,
+                `${API_BASE_URL}/applications/${id}`,
                 {
                     method: "PUT",
                     headers: {

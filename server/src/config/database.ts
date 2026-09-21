@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import JobApplication from "../models/JobApplication.js";
 
 const connectDB = async (): Promise<void> => {
     try {
