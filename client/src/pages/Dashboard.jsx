@@ -176,7 +176,7 @@ function Dashboard() {
 
     if (loading) {
         return (
-            <section>
+            <section className="p-6">
                 <div className="mb-8 animate-pulse">
                     <div className="h-4 w-24 rounded bg-slate-200" />
                     <div className="mt-3 h-10 w-52 rounded bg-slate-200" />
