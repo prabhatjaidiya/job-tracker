@@ -1,4 +1,3 @@
-
 # 🚀 Job Tracker
 
 A full-stack web application to organize, manage, and track job and internship applications in one place.
@@ -75,31 +74,20 @@ This project demonstrates my experience building and deploying a full-stack appl
 
 ## 📸 Screenshots
 
-Screenshots of the actual application will be added here.
-
-Save your screenshots in a `screenshots/` directory in the repository.
-
 ### Dashboard
-
 ![Job Tracker Dashboard](screenshots/dashboard.png)
 
 ### Applications
-
 ![Job Applications](screenshots/applications.png)
 
 ### Add Application
-
 ![Add Job Application](screenshots/add-application.png)
 
 ### Edit Application
-
 ![Edit Job Application](screenshots/edit-application.png)
 
 ### Login Page
-
-![Job Application login](screenshots/login.png)
-
-> Replace these image paths with your actual screenshot filenames if they differ.
+![Job Tracker Login](screenshots/login.png)
 
 ---
 
@@ -109,7 +97,6 @@ The project contains separate frontend and backend applications.
 
 ```text
 job-tracker/
-│
 ├── client/                  # React frontend
 │   ├── src/
 │   │   ├── components/
@@ -117,7 +104,6 @@ job-tracker/
 │   │   ├── context/
 │   │   └── ...
 │   └── package.json
-│
 ├── server/                  # Express backend
 │   ├── src/
 │   │   ├── models/
@@ -125,13 +111,10 @@ job-tracker/
 │   │   ├── middleware/
 │   │   └── ...
 │   └── package.json
-│
 ├── screenshots/             # Project screenshots
 ├── .gitignore
 └── README.md
 ```
-
-> Adjust the directory names to match your actual repository structure before publishing.
 
 ---
 
@@ -151,12 +134,7 @@ Make sure you have installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/prabhatjaidiya/job-tracker
-```
-
-Navigate into the project directory:
-
-```bash
+git clone https://github.com/prabhatjaidiya/job-tracker.git
 cd job-tracker
 ```
 
@@ -167,9 +145,7 @@ cd server
 npm install
 ```
 
-Create a `.env` file inside the `server` directory.
-
-Add the required environment variables:
+Create a `.env` file inside the `server` directory. Add the variables required by your backend. For example:
 
 ```env
 PORT=5000
@@ -177,7 +153,7 @@ MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
 ```
 
-> Use the actual environment variable names expected by your backend. Do not commit your real `.env` file or secrets to GitHub.
+> The backend also uses additional configuration for services such as Cloudinary and email. See the Environment Variables section and ensure the variable names match your source code.
 
 Start the backend:
 
@@ -189,20 +165,18 @@ If your backend uses a different development script, use the script defined in `
 
 ### 3. Set Up the Frontend
 
-Open a new terminal:
+Open a new terminal from the project root:
 
 ```bash
 cd client
 npm install
 ```
 
-Create a `.env` file inside the `client` directory.
+Create a `.env` file inside the `client` directory:
 
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000/api
 ```
-
-> Replace `VITE_API_URL` with the actual variable name used by your frontend if it differs.
 
 Start the frontend:
 
@@ -220,67 +194,97 @@ http://localhost:5173
 
 ## 🔑 Environment Variables
 
-Configure these variables locally and in your deployment environment.
+Configure the following variables locally and in your Render deployment settings. Use the exact names expected by your source code.
 
-### Backend
+### Backend (Server)
 
 | Variable | Description |
 |---|---|
 | `PORT` | Port used by the backend server |
+| `CLIENT_URL` | Frontend URL allowed to access the backend |
 | `MONGODB_URI` | MongoDB connection string |
 | `JWT_SECRET` | Secret used to sign and verify JWTs |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name for image uploads |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `EMAIL_HOST` | SMTP server hostname |
+| `EMAIL_PORT` | SMTP server port |
+| `EMAIL_USER` | SMTP account username |
+| `EMAIL_PASS` | SMTP account password or app password |
+| `EMAIL_FROM` | Sender email address |
 
-### Frontend
+### Frontend (Client)
 
 | Variable | Description |
 |---|---|
 | `VITE_API_URL` | Backend API base URL |
 
-**Important:** These are example names based on a typical setup. Verify them against your actual source code and deployment settings before using this section as exact configuration documentation.
+For local development:
 
-Never publish database credentials, JWT secrets, API keys, or real user tokens.
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+For production, set `VITE_API_URL` to your deployed backend API base URL, including `/api`.
+
+> Set production values in Render's Environment settings and local values in your `.env` files. Never commit real `.env` files, database credentials, JWT secrets, Cloudinary secrets, email passwords, or API keys to GitHub.
 
 ---
 
 ## 🔌 API Endpoints
 
-The backend exposes REST API routes for authentication and job application management.
+**Base URL:** `https://job-tracker-fbb2.onrender.com/api`
 
-### Health
+### Health Check
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Access |
 |---|---|---|
-| GET | `/api/health` | Check backend health |
+| GET | `/health` | Public |
 
-### Authentication
+### Authentication & Profile
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Access |
 |---|---|---|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Log in a user |
-| GET | `/api/auth/me` | Retrieve the authenticated user's information |
+| POST | `/auth/register` | Public |
+| POST | `/auth/login` | Public |
+| POST | `/auth/forgot-password` | Public |
+| POST | `/auth/reset-password/:token` | Public |
+| GET | `/auth/me` | Protected |
+| PATCH | `/auth/change-password` | Protected |
+| PATCH | `/auth/profile` | Protected |
+| PATCH | `/auth/profile/photo` | Protected |
 
 ### Job Applications
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Access |
 |---|---|---|
-| GET | `/api/applications` | Retrieve the user's applications |
-| POST | `/api/applications` | Create a job application |
-| GET | `/api/applications/:id` | Retrieve an application by ID |
-| PUT | `/api/applications/:id` | Update an application |
-| DELETE | `/api/applications/:id` | Delete an application |
+| GET | `/applications` | Protected |
+| POST | `/applications` | Protected |
+| GET | `/applications/stats` | Protected |
+| GET | `/applications/:id` | Protected |
+| PUT | `/applications/:id` | Protected |
+| DELETE | `/applications/:id` | Protected |
 
-> Verify the exact application routes and supported methods against your current backend before publishing. The `:id` route is included as a conventional resource endpoint and should be removed if your implementation does not expose it.
+### Application Activities
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/applications/:id/activities` | Protected |
+| POST | `/applications/:id/activities` | Protected |
 
 ### Authentication
 
-Protected endpoints require a valid authentication token according to the backend's authentication middleware.
-
-Example header:
+Protected endpoints require a JWT access token in the request header:
 
 ```http
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
+
+### Profile Photo Upload
+
+The profile photo endpoint accepts `multipart/form-data` with the field name `profilePhoto`.
+
+> All endpoints are protected except the health check, registration, login, forgot-password, and reset-password endpoints.
 
 ---
 
@@ -289,7 +293,6 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ### User
 
 The user model includes:
-
 - Name
 - Email
 - Password hash
@@ -298,7 +301,6 @@ The user model includes:
 ### Job Application
 
 The job application model includes:
-
 - Company
 - Position
 - Location
@@ -313,7 +315,7 @@ The job application model includes:
 - Contact information
 - User reference
 
-The application records are associated with their respective users.
+Application records are associated with their respective users.
 
 ---
 
@@ -327,7 +329,7 @@ Security-related implementation includes:
 - Environment variables for sensitive configuration.
 - User-specific application ownership checks.
 
-Never share your production credentials or commit sensitive environment files.
+Never share production credentials or commit sensitive environment files.
 
 ---
 
