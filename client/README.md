@@ -1,16 +1,75 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Job Tracker — Frontend
 
-Currently, two official plugins are available:
+The frontend of **Job Tracker**, a full-stack web application that helps job seekers manage and track their job and internship applications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
 
-## React Compiler
+- React
+- Vite
+- Tailwind CSS
+- React Router
+- Recharts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- User registration and login
+- Protected routes
+- Dashboard for tracking applications
+- Create, view, update, and delete job applications
+- Track application statuses and important dates
+- View application statistics
+- Manage user profile
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Getting Started
+
+### 1. Navigate to the client folder
+
+```bash
+cd client
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file inside the `client` folder:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+For production, set `VITE_API_URL` to your deployed backend API URL in your hosting provider's environment settings.
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+Vite will display the local URL in your terminal.
+
+## Available Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview the production build |
+
+## Backend
+
+This frontend communicates with the Job Tracker backend through its REST API.
+
+## Live Demo
+
+[Open Job Tracker](https://job-tracker-frontend-26wf.onrender.com)
+
+## Main Repository
+
+[View the Job Tracker repository](https://github.com/prabhatjaidiya/job-tracker)
